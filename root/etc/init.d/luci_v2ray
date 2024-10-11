@@ -715,22 +715,16 @@ add_v2ray_tproxy_rules() {
 	ip6tables-restore --noflush </tmp/tproxy_nf6tables.txt
 }
 
-clear_v2ray_rules() {
-	iptables-save --counters | grep -v "V2RAY" | iptables-restore --counters
-
+clear_v2ray_route() {
 	while ip rule del fwmark 1 lookup 100 2>/dev/null; do true; done
 	while ip rule del fwmark 0x1 lookup 100 2>/dev/null; do true; done
 	while ip rule del fwmark 0x1/0x3 lookup 100 2>/dev/null; do true; done
-
 	ip route flush table 100
 	ip route del local 0.0.0.0/0 dev lo table 100 2>/dev/null
-
-	ip6tables-save --counters | grep -v "V2RAY" | ip6tables-restore --counters
 
 	while ip -6 rule del fwmark 1 lookup 100 2>/dev/null; do true; done
 	while ip -6 rule del fwmark 0x1 lookup 100 2>/dev/null; do true; done
 	while ip -6 rule del fwmark 0x1/0x3 lookup 100 2>/dev/null; do true; done
-
 	ip -6 route flush table 100
 	ip -6 route del local ::/0 dev lo table 100 2>/dev/null
 }
@@ -797,9 +791,9 @@ create_v2ray_ipset() {
 	EOF
 }
 
-destroy_v2ray_ipset() {
-	ipset -! restore <<-EOF 2>/dev/null
-		$(ipset -n list | grep "^v2ray" | sed "s/^/destroy /")
+destroy_v2ray_rules() {
+	nft -f - <<-EOF 2>/dev/null
+		delete table inet v2ray 
 	EOF
 }
 
@@ -2434,8 +2428,8 @@ setup_transparent_proxy() {
 }
 
 clear_transparent_proxy() {
-	clear_v2ray_rules
-	destroy_v2ray_ipset
+	clear_v2ray_route
+	destroy_v2ray_rules
 
 	if [ -s "$FILE_V2RAY_DNSMASQ" ]; then
 		rm -f "$FILE_V2RAY_DNSMASQ"
