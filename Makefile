@@ -15,8 +15,7 @@ PKG_MAINTAINER:=Xingwang Liao <kuoruan@gmail.com>
 PKG_BUILD_DEPENDS:=luci-base/host
 
 LUCI_TITLE:=LuCI support for v2ray
-LUCI_DEPENDS:=+jshn +ip +ipset +iptables +resolveip +dnsmasq-full \
-	+iptables-mod-tproxy
+LUCI_DEPENDS:=+jshn +ip +resolveip +dnsmasq-full +kmod-nft-tproxy
 LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/conffiles

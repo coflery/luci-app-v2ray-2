@@ -32,11 +32,9 @@ Dependencies:
 
 - jshn
 - ip (ip-tiny or ip-full)
-- ipset
-- iptables
-- iptables-mod-tproxy
 - resolveip
-- dnsmasq-full (dnsmasq ipset is required)
+- dnsmasq-full (dnsmasq nftset is required)
+- kmod-nft-tproxy
 
 For translations, please install ```luci-i18n-v2ray-*```.
 
