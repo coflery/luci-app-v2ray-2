@@ -55,7 +55,7 @@ return L.view.extend({
         }
         (a = f.option(form.ListValue, "domain_matcher_r", _("Domain name matching algorithm"))).value(""), 
         a.value("linear"), a.value("mph");
-        var V = m.section(form.TypedSection, "routing_balancer", _("Routing Balancer", _("Add routing balancers here")));
+        var V = m.section(form.TypedSection, "routing_balancer", _("Routing Balancer"), _("Add routing balancers here"));
         return V.anonymous = !0, V.addremove = !0, (a = V.option(form.Value, "tag", _("Tag"))).rmempty = !1, 
         (a = V.option(form.ListValue, "strategy_type", _("Balancer strategy"))).value("random"), 
         a.value("leastPing"), a.modalonly = !0, a = V.option(form.DynamicList, "selector", _("Selector")), 
