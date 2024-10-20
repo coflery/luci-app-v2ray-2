@@ -82,16 +82,16 @@ if [ "x$transparent_proxy" != "xtransparent_proxy" ] ; then
 fi
 
 uci -q batch <<-EOF >/dev/null
-	delete ucitrack.@v2ray[-1]
-	add ucitrack v2ray
-	set ucitrack.@v2ray[-1].init=v2ray
+	delete ucitrack.@luci_v2ray[-1]
+	add ucitrack luci_v2ray
+	set ucitrack.@luci_v2ray[-1].init=luci_v2ray
 	commit ucitrack
-	# delete firewall.v2ray
-	# set firewall.v2ray=include
-	# set firewall.v2ray.type=script
-	# set firewall.v2ray.path=/etc/firewall.v2ray
-	# set firewall.v2ray.family=any
-	# set firewall.v2ray.reload=1
+	# delete firewall.luci_v2ray
+	# set firewall.luci_v2ray=include
+	# set firewall.luci_v2rayv2ray.type=script
+	# set firewall.luci_v2ray.path=/etc/firewall.v2ray
+	# set firewall.luci_v2ray.family=any
+	# set firewall.luci_v2ray.reload=1
 	# commit firewall
 EOF
 

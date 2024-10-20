@@ -593,6 +593,8 @@ add_v2ray_tproxy_rules() {
 	local nftset_dst_direct="$NFSET_DST_DIRECT_V4"
 	local nftset_src_direct_v6="$NFSET_SRC_DIRECT_V6"
 	local nftset_dst_direct_v6="$NFSET_DST_DIRECT_V6"
+	local nftset_dst_proxy_v4="$NFSET_DST_PROXY_V4"
+	local nftset_dst_proxy_v6="$NFSET_DST_PROXY_V6"
 
 	test -n "$port" || return
 
@@ -601,119 +603,24 @@ add_v2ray_tproxy_rules() {
 	ip rule add fwmark 0x1/0x3 lookup 100
 	ip route add local 0.0.0.0/0 dev lo table 100 2>/dev/null
 
-	cat <<-EOF >/tmp/tproxy_nftables.txt
-		*mangle
-		:V2RAY -
-		-A V2RAY -j RETURN -m mark --mark 0x2/0x2
-		$(
-			if [ -n "$addition" ]; then
-				echo "-A V2RAY -p udp --dport 53 -j TPROXY --on-ip 127.0.0.1 --on-port $port --tproxy-mark 0x1/0x3"
-				echo "-A V2RAY -p tcp --dport 53 -j TPROXY --on-ip 127.0.0.1 --on-port $port --tproxy-mark 0x1/0x3"
-			fi
-		)
-		-A V2RAY -j RETURN -m set --match-set $nftset_src_direct src
-		-A V2RAY -j RETURN -m set --match-set $nftset_dst_direct dst
-		-A V2RAY -p tcp $ext_args -j TPROXY --on-ip 127.0.0.1 --on-port $port --tproxy-mark 0x1/0x3
-		$(
-			if [ "$addition" = "udp" ]; then
-				echo "-A V2RAY -p udp -j TPROXY --on-ip 127.0.0.1 --on-port $port --tproxy-mark 0x1/0x3"
-			fi
-
-			if [ -n "$lan_devices" ]; then
-				local device
-				for device in $lan_devices; do
-					echo "-A PREROUTING -i $device -j V2RAY"
-				done
-
-				echo "-A PREROUTING -j V2RAY -m mark --mark 0x1/0x3"
-			else
-				echo "-A PREROUTING -j V2RAY"
-			fi
-		)
-
-		:V2RAY_MASK -
-		-A V2RAY_MASK -j RETURN -m mark --mark 0x2/0x2
-		-A V2RAY_MASK -j RETURN -m set --match-set $nftset_src_direct src
-		-A V2RAY_MASK -j RETURN -m set --match-set $nftset_dst_direct dst
-		-A V2RAY_MASK -p tcp $ext_args -j MARK --set-mark 0x1/0x3
-		$(
-			if [ -n "$addition" ]; then
-				if [ "$addition" = "dns" ]; then
-					echo "-A V2RAY_MASK -p udp --dport 53 -j MARK --set-mark 0x1/0x3"
-				else
-					echo "-A V2RAY_MASK -p udp -j MARK --set-mark 0x1/0x3"
-				fi
-			fi
-		)
-		-A OUTPUT -j V2RAY_MASK
-
-		:V2RAY_DIVERT -
-		-A V2RAY_DIVERT -j MARK --set-mark 0x1/0x3
-		-A V2RAY_DIVERT -j ACCEPT
-		-I PREROUTING -p tcp -m socket --transparent -j V2RAY_DIVERT
-		COMMIT
-	EOF
-
-	iptables-restore --noflush </tmp/tproxy_nftables.txt
-
 	ip -6 rule add fwmark 0x1/0x3 lookup 100
 	ip -6 route add local ::/0 dev lo table 100
 
-	cat <<-EOF >/tmp/tproxy_nf6tables.txt
-		*mangle
-		:V2RAY -
-		-A V2RAY -j RETURN -m mark --mark 0x2/0x2
-		$(
-			if [ -n "$addition" ]; then
-				echo "-A V2RAY -p udp --dport 53 -j TPROXY --on-ip ::1 --on-port $port --tproxy-mark 0x1/0x3"
-				echo "-A V2RAY -p tcp --dport 53 -j TPROXY --on-ip ::1 --on-port $port --tproxy-mark 0x1/0x3"
-			fi
-		)
-		-A V2RAY -j RETURN -m set --match-set $nftset_src_direct_v6 src
-		-A V2RAY -j RETURN -m set --match-set $nftset_dst_direct_v6 dst
-		-A V2RAY -p tcp $ext_args -j TPROXY --on-ip ::1 --on-port $port --tproxy-mark 0x1/0x3
-		$(
-			if [ "$addition" = "udp" ]; then
-				echo "-A V2RAY -p udp -j TPROXY --on-ip ::1 --on-port $port --tproxy-mark 0x1/0x3"
-			fi
+	cat <<-EOF >/tmp/tproxy_nftables.txt
+		table inet $NFTABLE {
+			chain prerouting {
+				type filter hook prerouting priority mangle; policy accept;
+				ip daddr != @$nftset_dst_proxy_v4 return
+				ip6 daddr != @$nftset_dst_proxy_v6 return
+				meta l4proto {tcp, udp} tproxy to :$port meta mark set 1
 
-			if [ -n "$lan_devices" ]; then
-				local device
-				for device in $lan_devices; do
-					echo "-A PREROUTING -i $device -j V2RAY"
-				done
-
-				echo "-A PREROUTING -j V2RAY -m mark --mark 0x1/0x3"
-			else
-				echo "-A PREROUTING -j V2RAY"
-			fi
-		)
-
-		:V2RAY_MASK -
-		-A V2RAY_MASK -j RETURN -m mark --mark 0x2/0x2
-		-A V2RAY_MASK -j RETURN -m set --match-set $nftset_src_direct_v6 src
-		-A V2RAY_MASK -j RETURN -m set --match-set $nftset_dst_direct_v6 dst
-		-A V2RAY_MASK -p tcp $ext_args -j MARK --set-mark 0x1/0x3
-		$(
-			if [ -n "$addition" ]; then
-				if [ "$addition" = "dns" ]; then
-					echo "-A V2RAY_MASK -p udp --dport 53 -j MARK --set-mark 0x1/0x3"
-				else
-					echo "-A V2RAY_MASK -p udp -j MARK --set-mark 0x1/0x3"
-				fi
-			fi
-		)
-		-A OUTPUT -j V2RAY_MASK
-
-		#look like divert has bug
-		:V2RAY_DIVERT -
-		-A V2RAY_DIVERT -j MARK --set-mark 0x1/0x3
-		-A V2RAY_DIVERT -j ACCEPT
-		-I PREROUTING -p tcp -m socket -j V2RAY_DIVERT
-		COMMIT
+				#ip protocol {tcp, udp} tproxy ip to :$port meta mark set 1
+				#ip6 nexthdr {tcp, udp} tproxy ip6 to :$port meta mark set 1
+			}
+		}
 	EOF
 
-	ip6tables-restore --noflush </tmp/tproxy_nf6tables.txt
+	nft -f /tmp/tproxy_nftables.txt
 }
 
 clear_v2ray_route() {
