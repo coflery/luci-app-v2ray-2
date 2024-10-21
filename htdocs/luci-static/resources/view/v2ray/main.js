@@ -20,7 +20,7 @@
 var StartControlGroup = form.DummyValue.extend({
     handleServiceReload: function () {
         return fs
-            .exec("/etc/init.d/luci_v2ray", ["reload"])
+            .exec("/etc/init.d/v2ray", ["reload"])
             .then(
                 L.bind(
                     function (res) {
@@ -44,7 +44,7 @@ var StartControlGroup = form.DummyValue.extend({
     },
     handleServiceStop: function () {
         return fs
-            .exec("/etc/init.d/luci_v2ray", ["stop"])
+            .exec("/etc/init.d/v2ray", ["stop"])
             .then(
                 L.bind(
                     function (res) {
@@ -68,7 +68,7 @@ var StartControlGroup = form.DummyValue.extend({
     },
     handleServiceStart: function () {
         return fs
-            .exec("/etc/init.d/luci_v2ray", ["start"])
+            .exec("/etc/init.d/v2ray", ["start"])
             .then(
                 L.bind(
                     function (res) {
@@ -128,7 +128,7 @@ return L.view.extend({
     },
     render: function(e) {
         const m = new form.Map(
-            "luci_v2ray",
+            "v2ray",
             "%s - %s".format(_("V2ray"), _("Global Settings")),
             "<p>%s</p><p>%s</p>".format(
                 _("A platform for building proxies to bypass network restrictions."),
@@ -186,7 +186,7 @@ return L.view.extend({
         o.wrap = "off";
         o.rows = 5;
         o.datatype = "string";
-        o.filepath = "/etc/luci_v2ray/transport.json";
+        o.filepath = "/etc/v2ray/transport.json";
         o.required = true;
         o.isjson = true;
         

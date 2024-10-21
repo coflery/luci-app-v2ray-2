@@ -21,7 +21,7 @@ return L.view.extend({
         return v2ray.getLocalIPs();
     },
     render: function(localIPs) {
-        const m = new form.Map("luci_v2ray", "%s - %s".format(_("V2Ray"), _("Inbound")));
+        const m = new form.Map("v2ray", "%s - %s".format(_("V2Ray"), _("Inbound")));
 
         if (localIPs === 0) {
             localIPs = [];
@@ -30,7 +30,7 @@ return L.view.extend({
         var e, t = m.section(form.GridSection, "inbound");
         t.anonymous = !0, t.addremove = !0, t.sortable = !0;
         t.modaltitle = function(section_id) {
-            var e = uci.get("luci_v2ray", section_id, "alias");
+            var e = uci.get("v2ray", section_id, "alias");
             return _("Inbound") + " » " + (null != e ? e : _("Add"));
         };
         t.nodescriptions = true;

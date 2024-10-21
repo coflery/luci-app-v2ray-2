@@ -16,10 +16,10 @@
 
 return view.extend({
   load: function () {
-    return uci.load("luci_v2ray").then((function () {
+    return uci.load("v2ray").then((function () {
       let configFile = uci.get("v2ray", "main", "config_file");
       if (!configFile) {
-        configFile = "/var/etc/luci_v2ray/v2ray.main.json";
+        configFile = "/var/etc/v2ray/v2ray.main.json";
       }
 
       return Promise.all([

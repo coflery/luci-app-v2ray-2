@@ -10,7 +10,7 @@
         "luci-app-v2ray"
       ],
       "uci": {
-        "luci_v2ray": true
+        "v2ray": true
       }
     }
   },

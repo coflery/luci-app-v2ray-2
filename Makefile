@@ -19,10 +19,10 @@ LUCI_DEPENDS:=+jshn +ip +resolveip +dnsmasq-full +kmod-nft-tproxy
 LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/conffiles
-/etc/config/luci_v2ray
-/etc/luci_v2ray/transport.json
-/etc/luci_v2ray/directlist.txt
-/etc/luci_v2ray/proxylist.txt
+/etc/config/v2ray
+/etc/v2ray/transport.json
+/etc/v2ray/directlist.txt
+/etc/v2ray/proxylist.txt
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
@@ -38,8 +38,8 @@ if [ -z "$${IPKG_INSTROOT}" ] ; then
 	killall -HUP rpcd 2>/dev/null
 fi
 
-chmod 755 "$${IPKG_INSTROOT}/etc/init.d/luci_v2ray" >/dev/null 2>&1
-ln -sf "../init.d/luci_v2ray" \
+chmod 755 "$${IPKG_INSTROOT}/etc/init.d/v2ray" >/dev/null 2>&1
+ln -sf "../init.d/v2ray" \
 	"$${IPKG_INSTROOT}/etc/rc.d/S99v2ray" >/dev/null 2>&1
 
 exit 0

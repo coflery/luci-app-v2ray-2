@@ -173,7 +173,7 @@ return L.view.extend({
     render: function (dokodemoDoorPorts) {
         void 0 === dokodemoDoorPorts && (dokodemoDoorPorts = []);
         const m = new form.Map(
-            "luci_v2ray",
+            "v2ray",
             "%s - %s".format(_("V2Ray"), _("Transparent Proxy"))
         );
 
@@ -292,7 +292,7 @@ return L.view.extend({
         o.wrap = "off";
         o.rows = 5;
         o.datatype = "string";
-        o.filepath = "/etc/luci_v2ray/proxylist.txt";
+        o.filepath = "/etc/v2ray/proxylist.txt";
 
         o = s.option(
             custom.TextValue,
@@ -305,7 +305,7 @@ return L.view.extend({
         o.wrap = "off";
         o.rows = 5;
         o.datatype = "string";
-        o.filepath = "/etc/luci_v2ray/directlist.txt";
+        o.filepath = "/etc/v2ray/directlist.txt";
 
         o = s.option(
             form.Value,
@@ -337,7 +337,7 @@ return L.view.extend({
         o.wrap = "off";
         o.rows = 3;
         o.datatype = "string";
-        o.filepath = "/etc/luci_v2ray/srcdirectlist.txt";
+        o.filepath = "/etc/v2ray/srcdirectlist.txt";
 
         return m.render();
     }

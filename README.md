@@ -61,9 +61,9 @@ Please take a look to [build-openwrt.yml](./.github/workflows/build-openwrt.yml)
 ```shell
 curl -s 'https://ftp.apnic.net/stats/apnic/delegated-apnic-latest' | \
    awk -F '|' '{if($2=="CN"&&$3=="ipv4"){printf "%s/%d\n",$4,32-log($5)/log(2)}}' \
-   > ./root/etc/luci_v2ray/chnroute.txt
+   > ./root/etc/v2ray/chnroute.txt
 
 curl -s 'https://ftp.apnic.net/stats/apnic/delegated-apnic-latest' | \
    awk -F '|' '{if($2=="CN"&&$3=="ipv6"){printf "%s/%d\n",$4,$5}}' \
-   > ./root/etc/luci_v2ray/chnroute6.txt
+   > ./root/etc/v2ray/chnroute6.txt
 ```
