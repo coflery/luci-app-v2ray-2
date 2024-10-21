@@ -29,6 +29,7 @@ return L.view.extend({
             a.value(g.value, g.caption);
         }
         a = s.option(form.MultiValue, "balancers", _("Balancers"), _("Select routing balancers to use"));
+        a.value("none", _("None"))
         for (var p = 0, v = i; p < v.length; p++) {
             g = v[p];
             a.value(g.value, g.caption);
